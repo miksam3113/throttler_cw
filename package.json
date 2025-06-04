@@ -50,7 +50,7 @@
         "hono": "^4.7.8",
         "lodash": "4.17.21",
         "runtypes": "6.3.2",
-        "wrangler": "^3.57.1"
+        "wrangler": "^4.19.1"
     },
     "config": {
         "commitizen": {

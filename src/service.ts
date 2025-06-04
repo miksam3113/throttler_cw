@@ -177,7 +177,8 @@ export const addEvents = (
     return state;
 };
 
-export const clearOldData = (state: State, now: number): void => {
+export const clearOldData = (state: State, now: number) => {
+    const resourceIds = [];
     for (const resourceId of Object.keys(state)) {
         for (const [throttlerPeriod, groupThrottlingState] of Object.entries(state[resourceId])) {
             
@@ -194,7 +195,8 @@ export const clearOldData = (state: State, now: number): void => {
 
                 if (blocksNeedToDelete > throttlerResolution) {
                     if (Object.keys(groupThrottlingState).length <= 1) {
-                        delete state[resourceId];
+                        resourceIds.push(resourceId);
+                        // delete state[resourceId];
 
                         continue;
                     }
@@ -206,4 +208,6 @@ export const clearOldData = (state: State, now: number): void => {
             
         }
     }
+
+    return resourceIds;
 };

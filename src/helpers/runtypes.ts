@@ -9,6 +9,7 @@ import {
     Static, 
     Undefined
 } from 'runtypes';
+import { DurableState } from "../index";
 
 const RTPerOfThrottler = Union(
     Literal('7d'),
@@ -72,6 +73,10 @@ type StateEntry = Static<typeof RTStateEntry>;
 
 const RTState = Dictionary(RTStateEntry);
 type State = Static<typeof RTState>;
+
+export type Bindings = {
+    STATE: DurableObjectNamespace<DurableState>;
+}
 
 export { 
     RTThrottlerRequests,

@@ -1,29 +1,46 @@
-import throttle from './throttler';
+import { Hono } from 'hono';
 
-import { Hono} from 'hono';
+import { RTThrottlerRequests, Bindings, StateEntry } from './helpers/runtypes';
+import { DurableObject } from 'cloudflare:workers';
+import { Env } from "./helpers/interfaces";
+import { addState, clearData } from "./helpers/durableMethods";
 
-import { State, RTThrottlerRequests } from './helpers/runtypes';
-import {clearOldData} from "./service";
+export class DurableState extends DurableObject {
+    constructor(ctx: DurableObjectState, env: Env) {
+        super(ctx, env);
+    }
 
-export const state: State = {};
+    async clearData(resourceId: string) {
+        await this.ctx.storage.delete(resourceId);
+    }
 
+    async getState() {
+        return this.ctx.storage.list();
+    }
 
-const app = new Hono()
+    async addData(resourceId: string, newState: StateEntry) {
+        const state = (await this.ctx.storage.get(resourceId)) || {};
+        await this.ctx.storage.put(resourceId, newState);
+        return state;
+    }
+}
 
-app.post('/api/events', async (c) => {
-    const body = await c.req.json();
+const app = new Hono<{ Bindings: Bindings }>();
+
+app.post('/api/events', async (ctx) => {
+    const body = await ctx.req.json();
+    const env = ctx.env;
     const events = RTThrottlerRequests.check(body.events);
 
-    const data = await throttle(events, state, Date.now());
+    const data = await addState(env, events);
 
-    return c.json(data);
+    return ctx.json(data);
 });
-
 
 export default {
     fetch: app.fetch,
-    scheduled() {
-        clearOldData(state, Date.now())
+    async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+        await clearData(env);
     },
 };
 

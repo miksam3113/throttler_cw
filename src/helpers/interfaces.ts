@@ -1,3 +1,5 @@
+import { DurableState } from "../index";
+
 interface ResultOfResourceVerifications {
     [event: string]: {
         allow: boolean[];
@@ -23,6 +25,10 @@ interface ResultOfVerification {
 interface ListOfVerifications {
     totalPointsSize: { allow: boolean; reason: string };
     points: { allow: boolean; reason: string };
+}
+
+export interface Env {
+    STATE: DurableObjectNamespace<DurableState>;
 }
 
 export {

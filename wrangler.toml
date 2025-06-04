@@ -5,3 +5,11 @@ compatibility_flags = ["nodejs_compat"]
 
 [triggers]
 crons = ["*/5 * * * *"]
+
+[[durable_objects.bindings]]
+name = "STATE"
+class_name = "DurableState"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DurableState"]
